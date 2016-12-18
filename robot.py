@@ -41,8 +41,8 @@ class Robot(object):
 
         print "The location of robot is ... ", self.location
         #print "The sensors values are: for left, ", sensors[0], "for center: ", sensors[1], " and for right: ", sensors[2] 
-        if not (copy.copy(self.location) in self.visited):
-            self.visited.append (copy.copy(self.location))
+        
+        self.visited.append (copy.copy(self.location))
         #print "self.visited is : \n"
         #for i in range (len (self.visited)):
          #   print self.visited[i]
@@ -61,28 +61,16 @@ class Robot(object):
             else:
                 i += 1
 
+        #omit all the possible states with distance more than one
+        list_candidates = self.findCandidateDistanceOne(list_candidates)
+
         print "The candidates are... \n"
         for i in range (len(list_candidates)):
             print list_candidates[i]
         # Finding best candidate, closest to goal, from the remaining candidates
         
         if len(list_candidates) == 0:
-            #print "the tolerance is: ", self.tolerate
-            '''
-            if self.tolerate == 0: 
-                rotation = 90
-                movement = 0
-                if self.heading == 'up':
-                    self.heading = 'right'
-                elif self.heading == 'right':
-                    self.heading = 'down'
-                elif self.heading == 'down':
-                    self.heading = 'left'
-                else: #heading is left
-                    self.heading = 'up'
-                self.tolerate += 1
-            '''
-            #else:
+
             index = self.visited.index(self.location)
             rotation = 0
             print "The latest visit was: ", self.visited[index - 1]
@@ -331,3 +319,26 @@ class Robot(object):
         for i in range (4):
             distance += abs (location[0] - goal_locations[i][0]) + abs (location[1] - goal_locations[i][1])
         return distance / 4.0
+
+    def findCandidateDistanceOne (self, list_of_candidates):
+        '''
+        This function gets the list of possible candidates and only selects the ones with distance one to the 
+        robot's current location
+        '''
+        possible_candidates = []
+        for elements in list_of_candidates:
+            if abs(elements[0] - self.location[0]) + abs (elements[1] - self.location[1]) == 1:
+                possible_candidates.append (elements)
+
+        return possible_candidates
+
+    def reachedGoal (self):
+        '''
+        This function is a boolean functions that returns true when the agent has reached the goal in the maze
+        '''  
+        dim = self.maze_dim
+        #Creating the 4 goal locations of the maze based on the maze dimension
+        goal_locations = [[dim / 2, dim / 2], [dim / 2 - 1, dim / 2],
+                          [dim / 2, dim / 2 - 1], [dim / 2 - 1, dim / 2 - 1]]
+
+        return self.location in goal_locations
