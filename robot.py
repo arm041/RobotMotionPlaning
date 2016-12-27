@@ -50,7 +50,7 @@ class Robot(object):
             
             self.visited.append (copy.copy(self.location))
 
-            #Creating the list of candidates that can be visited from the robot's place
+            #Creating the list of candidates that can be visited from the robots current place
             list_candidates = self.generateCandidates(sensors)
             
             #Omitting the visited places from the candidates list
@@ -81,13 +81,29 @@ class Robot(object):
             
             #If the robot has reached the goal finish the exploration and go to second round
             if self.reachedGoal():
+
+                #calculating the maze coverage percentage 
+                list_temp = []
+                for i in self.visited:
+                    if not i in list_temp:
+                        list_temp.append (i)
+
+                print "The maze coverage percentage is: ", (len(list_temp) * 1.0) / (self.maze_dim * self.maze_dim) * 100 
+
+                print "Number of moves in first try is: ", self.moveCounter
+                #print "Map dict is: \n"
+                #for i in self.mapDict.keys():
+                #    print "row ", i, ": "
+                #    for j in self.mapDict[i]:
+                #        print j, ', '
                 movement = 'Reset'
                 rotation = 'Reset'
                 self.learning = False #The learning has finished
                 self.location = [0,0]
                 self.heading = 'up'
-                #optimalMoves = []
+
                 self.optimalMoves.append(self.visited[-1]) #Adding the goal to the optimal moves list
+              
                 indexCounter = self.moveCounter #indexCounter moves from the last visited place before the goal till the beginning of the visited to choose the optimal choices
                 #while indexCounter != 1:
                 for i in range (len(self.visited) - 2, 1, -1):
@@ -98,9 +114,9 @@ class Robot(object):
                                 indexCounter = j
                             
                                 break
-                for element in self.optimalMoves:
-                    print element, "\n"
-
+                #for element in self.optimalMoves:
+                 #   print element, "\n"
+                
             elif len(list_candidates) == 0: #There are no entries in possibility so reached a bad place time to backtrack
 
                 index = self.visited.index(self.location)
@@ -215,6 +231,7 @@ class Robot(object):
         it's allowed to move.
         '''
         list_of_candidates = []
+        #checking for the number of squares the sensors can see and based on the number adding the possible squares that the robot can move to
         if sensors[2] == 0:
             pass
         elif sensors[2] < 3:
